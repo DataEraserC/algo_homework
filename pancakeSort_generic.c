@@ -43,7 +43,18 @@ int pancakeSort(int *unsorted_array, int sort_start, int sort_end) { return 0; }
 #else
 
 int pancakeSort(void *unsorted_array, size_t len, size_t elem_byte_size,
-                int (*compare_function)(const void *a, const void *b)) {
+                int (*find_max_elem)(void *array, size_t len,
+                                     size_t elem_byte_size,
+                                     int (*compare_function)(const void *a,
+                                                             const void *b))) {
+  if (len == 1) {
+    return 0;
+  }
+  int max_elem =
+      find_max_elem(unsorted_array, len, elem_byte_size, compare_int);
+  pancakeSort(unsorted_array, max_elem + 1, elem_byte_size, find_max_elem);
+  pancakeSort(unsorted_array, len, elem_byte_size, find_max_elem);
+
   return 0;
 }
 
@@ -58,18 +69,19 @@ int main() {
     printf("%d ", array1[i]);
   printf("\n");
 
-  printf("max_elem:%d\n",
-         find_max_elem(array1, length_of_array(array1), sizeof(int) / sizeof(char),
-                       compare_int));
+  // printf("max_elem:%d\n",
+  //        find_max_elem(array1, length_of_array(array1),
+  //                      sizeof(int) / sizeof(char), compare_int));
 
-  reverse_array(array1, length_of_array(array1), sizeof(int) / sizeof(char),
-                swap_int);
+  // reverse_array(array1, length_of_array(array1), sizeof(int) / sizeof(char),
+  //               swap_int);
+  pancakeSort(array1, length_of_array(array1), sizeof(int) / sizeof(char),find_max_elem);
 
   printf("after sort:  ");
   for (i = 0; i < length_of_array(array1); i++)
     printf("%d ", array1[i]);
-  printf("\n");
-  printf("max_elem:%d\n",
-         find_max_elem(array1, length_of_array(array1), sizeof(int) / sizeof(char),
-                       compare_int));
+  // printf("\n");
+  // printf("max_elem:%d\n",
+  //        find_max_elem(array1, length_of_array(array1),
+  //                      sizeof(int) / sizeof(char), compare_int));
 }
