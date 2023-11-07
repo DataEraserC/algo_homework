@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#define sizeof_array(array) sizeof(array) / sizeof(array[0])
+#define length_of_array(array) sizeof(array) / sizeof(array[0])
 
 static int reverse_times = 0;
 
@@ -64,14 +64,14 @@ int main() {
   int i;
 
   printf("before sort: ");
-  for (i = 0; i < sizeof_array(array1); i++)
+  for (i = 0; i < length_of_array(array1); i++)
     printf("%d ", array1[i]);
   printf("\n");
 
-  pancakeSort(array1, 0, sizeof_array(array1) - 1);
+  pancakeSort(array1, 0, length_of_array(array1) - 1);
 
   printf("after sort:  ");
-  for (i = 0; i < sizeof_array(array1); i++)
+  for (i = 0; i < length_of_array(array1); i++)
     printf("%d ", array1[i]);
   printf("\n");
 }

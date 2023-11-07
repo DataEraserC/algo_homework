@@ -1,30 +1,40 @@
 #include <stdio.h>
 
-#define sizeof_array(array) sizeof(array) / sizeof(array[0])
+#define length_of_array(array) sizeof(array) / sizeof(array[0])
 
 static int reverse_times = 0;
 
 // todo: use generic for c
-int reverse_array(int *array, int start, int end) {
-  size_t i, j;
-  int temp;
-  for (i = start, j = end; i < j; i++, j--) {
-    temp = array[i];
-    array[i] = array[j];
-    array[j] = temp;
+int reverse_array(void *array, size_t len, size_t elem_byte_size,
+                  int (*swap_function)(const void *a, const void *b)) {
+  size_t i;
+  for (i = 0; i < len / 2; i++) {
+    swap_function(((char *)array + i * elem_byte_size),
+                  ((char *)array + (len - i - 1) * elem_byte_size));
   }
   return 0;
 }
 
-int find_max_elem(int *array, int start, int end) {
-  int i;
-  int max_elem = start;
-  for (i = start + 1; i <= end; i++) {
-    if (array[max_elem] < array[i]) {
+int find_max_elem(void *array, size_t len, size_t elem_byte_size,
+                  int (*compare_function)(const void *a, const void *b)) {
+  size_t max_elem = 0;
+  size_t i;
+  for (i = 0; i < len; i++) {
+    if (compare_function((char *)array + max_elem * elem_byte_size,
+                         (char *)array + i * elem_byte_size) < 0) {
       max_elem = i;
     }
   }
   return max_elem;
+}
+
+int compare_int(const void *a, const void *b) { return *(int *)a - *(int *)b; }
+
+int swap_int(const void *a, const void *b) {
+  int temp = *(int *)a;
+  *(int *)a = *(int *)b;
+  *(int *)b = temp;
+  return 0;
 }
 
 #if defined no_rec_imp
@@ -32,28 +42,8 @@ int find_max_elem(int *array, int start, int end) {
 int pancakeSort(int *unsorted_array, int sort_start, int sort_end) { return 0; }
 #else
 
-int pancakeSort(int *unsorted_array, int start, int end) {
-  int max_elem = find_max_elem(unsorted_array, start, end);
-  if (start == end) {
-    return 0;
-  }
-  reverse_array(unsorted_array, start, max_elem);
-  /*
-  reverse_times++;
-  printf("the %d times reverse:",reverse_times);
-  for(int i = start;i<=end;i++)
-    printf("%d ",unsorted_array[i]);
-  printf("\n");
-  */
-  reverse_array(unsorted_array, start, end);
-  pancakeSort(unsorted_array, start, end - 1);
-  /*
-  reverse_times++;
-  printf("the %d times reverse:",reverse_times);
-  for(int i = start;i<=end;i++)
-    printf("%d ",unsorted_array[i]);
-  printf("\n");
-  */
+int pancakeSort(void *unsorted_array, size_t len, size_t elem_byte_size,
+                int (*compare_function)(const void *a, const void *b)) {
   return 0;
 }
 
@@ -64,14 +54,22 @@ int main() {
   int i;
 
   printf("before sort: ");
-  for (i = 0; i < sizeof_array(array1); i++)
+  for (i = 0; i < length_of_array(array1); i++)
     printf("%d ", array1[i]);
   printf("\n");
 
-  pancakeSort(array1, 0, sizeof_array(array1) - 1);
+  printf("max_elem:%d\n",
+         find_max_elem(array1, length_of_array(array1), sizeof(int) / sizeof(char),
+                       compare_int));
+
+  reverse_array(array1, length_of_array(array1), sizeof(int) / sizeof(char),
+                swap_int);
 
   printf("after sort:  ");
-  for (i = 0; i < sizeof_array(array1); i++)
+  for (i = 0; i < length_of_array(array1); i++)
     printf("%d ", array1[i]);
   printf("\n");
+  printf("max_elem:%d\n",
+         find_max_elem(array1, length_of_array(array1), sizeof(int) / sizeof(char),
+                       compare_int));
 }
